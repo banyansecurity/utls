@@ -794,7 +794,7 @@ func (e *ApplicationSettingsExtensionNew) Read(b []byte) (int, error) {
 
 	// Read Type.
 	b[0] = byte(utlsExtensionApplicationSettingsNew >> 8)   // hex: 44 dec: 68
-	b[1] = byte(utlsExtensionApplicationSettingsNew & 0xff) // hex: 69 dec: 105
+	b[1] = byte(utlsExtensionApplicationSettingsNew & 0xff) // hex: cd dec: 205
 
 	lengths := b[2:] // get the remaining buffer without Type
 	b = b[6:]        // set the buffer to the buffer without Type, Length and ALPS Extension Length (so only the Supported ALPN list remains)
@@ -811,7 +811,7 @@ func (e *ApplicationSettingsExtensionNew) Read(b []byte) (int, error) {
 	lengths[2] = byte(stringsLength >> 8) // ALPS Extension Length hex: 00 dec: 0
 	lengths[3] = byte(stringsLength)      // ALPS Extension Length hex: 03 dec: 3
 	stringsLength += 2                    // plus ALPS Extension Length field length
-	lengths[0] = byte(stringsLength >> 8) // Length hex:00 dec: 0
+	lengths[0] = byte(stringsLength >> 8) // Length hex: 00 dec: 0
 	lengths[1] = byte(stringsLength)      // Length hex: 05 dec: 5
 
 	return e.Len(), io.EOF
