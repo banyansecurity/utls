@@ -81,6 +81,10 @@ func ExtensionFromID(id uint16) TLSExtension {
 		return &GREASEEncryptedClientHelloExtension{}
 	case extensionRenegotiationInfo:
 		return &RenegotiationInfoExtension{}
+	case fakeExtensionEncryptThenMAC:
+		return &FakeEncryptThenMACExtension{}
+	case fakeExtensionPostHandshakeAuth:
+		return &FakePostHandshakeAuthExtension{}
 	default:
 		if isGREASEUint16(id) {
 			return &UtlsGREASEExtension{}
@@ -1943,5 +1947,65 @@ func (e *FakeDelegatedCredentialsExtension) UnmarshalJSON(data []byte) error {
 			return fmt.Errorf("unknown delegated credentials signature scheme: %s", sigScheme)
 		}
 	}
+	return nil
+}
+
+type FakeEncryptThenMACExtension struct{}
+
+func (e *FakeEncryptThenMACExtension) writeToUConn(uc *UConn) error {
+	return nil
+}
+
+func (e *FakeEncryptThenMACExtension) Len() int {
+	return 4
+}
+
+func (e *FakeEncryptThenMACExtension) Read(b []byte) (int, error) {
+	if len(b) < e.Len() {
+		return 0, io.ErrShortBuffer
+	}
+	extensionID := fakeExtensionEncryptThenMAC
+	// https://datatracker.ietf.org/doc/html/rfc7366
+	b[0] = byte(extensionID >> 8)
+	b[1] = byte(extensionID & 0xff)
+	// The length is 0
+	return e.Len(), io.EOF
+}
+
+func (e *FakeEncryptThenMACExtension) Write(_ []byte) (int, error) {
+	return 0, nil
+}
+
+func (e *FakeEncryptThenMACExtension) UnmarshalJSON(_ []byte) error {
+	return nil
+}
+
+type FakePostHandshakeAuthExtension struct{}
+
+func (e *FakePostHandshakeAuthExtension) writeToUConn(uc *UConn) error {
+	return nil
+}
+
+func (e *FakePostHandshakeAuthExtension) Len() int {
+	return 4
+}
+
+func (e *FakePostHandshakeAuthExtension) Read(b []byte) (int, error) {
+	if len(b) < e.Len() {
+		return 0, io.ErrShortBuffer
+	}
+	extensionID := fakeExtensionPostHandshakeAuth
+	// https://www.rfc-editor.org/rfc/rfc8446.html#section-4.6.2
+	b[0] = byte(extensionID >> 8)
+	b[1] = byte(extensionID & 0xff)
+	// The length is 0
+	return e.Len(), io.EOF
+}
+
+func (e *FakePostHandshakeAuthExtension) Write(_ []byte) (int, error) {
+	return 0, nil
+}
+
+func (e *FakePostHandshakeAuthExtension) UnmarshalJSON(_ []byte) error {
 	return nil
 }

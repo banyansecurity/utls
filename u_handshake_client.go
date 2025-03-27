@@ -133,6 +133,7 @@ func (hs *clientHandshakeStateTLS13) sendClientEncryptedExtensions() error {
 	clientEncryptedExtensions := new(utlsClientEncryptedExtensionsMsg)
 	if c.utls.hasApplicationSettings {
 		clientEncryptedExtensions.hasApplicationSettings = true
+		clientEncryptedExtensions.isNewCodePoint = c.utls.isNewCodePoint
 		clientEncryptedExtensions.applicationSettings = c.utls.localApplicationSettings
 		if _, err := c.writeHandshakeRecord(clientEncryptedExtensions, hs.transcript); err != nil {
 			return err
@@ -144,6 +145,7 @@ func (hs *clientHandshakeStateTLS13) sendClientEncryptedExtensions() error {
 
 func (hs *clientHandshakeStateTLS13) utlsReadServerParameters(encryptedExtensions *encryptedExtensionsMsg) error {
 	hs.c.utls.hasApplicationSettings = encryptedExtensions.utls.hasApplicationSettings
+	hs.c.utls.isNewCodePoint = encryptedExtensions.utls.isNewCodePoint
 	hs.c.utls.peerApplicationSettings = encryptedExtensions.utls.applicationSettings
 	hs.c.utls.echRetryConfigs = encryptedExtensions.utls.echRetryConfigs
 
