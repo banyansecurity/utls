@@ -450,8 +450,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				// TODO: tlsfingerprint.io should record/provide application settings data
 				extWriter.(*ApplicationSettingsExtension).SupportedProtocols = []string{"h2"}
 			case utlsExtensionApplicationSettingsNew:
-				// TODO: tlsfingerprint.io should record/provide application settings data
-				extWriter.(*ApplicationSettingsExtension).SupportedProtocols = []string{"h2"}
+				extWriter.(*ApplicationSettingsExtensionNew).SupportedProtocols = []string{"h2"}
 			case extensionPreSharedKey:
 				log.Printf("[Warning] PSK extension added without data")
 			default:
@@ -614,7 +613,7 @@ var (
 	HelloFirefox_105  = ClientHelloID{helloFirefox, "105", nil, nil}
 	HelloFirefox_120  = ClientHelloID{helloFirefox, "120", nil, nil}
 
-	HelloChrome_Auto        = HelloChrome_131
+	HelloChrome_Auto        = HelloChrome_133
 	HelloChrome_58          = ClientHelloID{helloChrome, "58", nil, nil}
 	HelloChrome_62          = ClientHelloID{helloChrome, "62", nil, nil}
 	HelloChrome_70          = ClientHelloID{helloChrome, "70", nil, nil}
@@ -644,6 +643,8 @@ var (
 	HelloChrome_120_PQ = ClientHelloID{helloChrome, "120_PQ", nil, nil}
 	// Chrome w/ ML-KEM curve
 	HelloChrome_131 = ClientHelloID{helloChrome, "131", nil, nil}
+	// Chrome w/ New ALPS codepoint
+	HelloChrome_133 = ClientHelloID{helloChrome, "133", nil, nil}
 
 	HelloIOS_Auto = HelloIOS_14
 	HelloIOS_11_1 = ClientHelloID{helloIOS, "111", nil, nil} // legacy "111" means 11.1
@@ -684,6 +685,7 @@ type Weights struct {
 	Extensions_Append_Reneg                            float64
 	Extensions_Append_EMS                              float64
 	FirstKeyShare_Set_CurveP256                        float64
+	KeyShare_Append_RandomGroups                       float64
 	Extensions_Append_ALPS                             float64
 }
 
@@ -704,7 +706,8 @@ var DefaultWeights = Weights{
 	Extensions_Append_SCT:                              0.46,
 	Extensions_Append_Reneg:                            0.75,
 	Extensions_Append_EMS:                              0.77,
-	FirstKeyShare_Set_CurveP256:                        0.25,
+	FirstKeyShare_Set_CurveP256:                        0.00, // legacy setting
+	KeyShare_Append_RandomGroups:                       0.50,
 	Extensions_Append_ALPS:                             0.33,
 }
 
